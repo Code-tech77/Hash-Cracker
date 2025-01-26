@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Hash Cracker</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔒 Hash Cracker</h1>
+            <p>Crack MD5 or SHA1 hashes with ease.</p>
+            
+            <form id="hash-form">
+                <div class="form-group">
+                    <label for="hash">Enter Hash:</label>
+                    <input type="text" id="hash" name="hash" placeholder="Enter your hash here..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="algorithm">Select Algorithm:</label>
+                    <select id="algorithm" name="algorithm" required>
+                        <option value="" disabled selected>-- Choose Algorithm --</option>
+                        <option value="SHA1">SHA1</option>
+                        <option value="MD5">MD5</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn">Crack Password 🚀</button>
+            </form>
+            
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('hash-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const hash = document.getElementById('hash').value;
+            const algorithm = document.getElementById('algorithm').value;
+
+            // Clear previous results
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p class="loading">Cracking... 🔍</p>';
+
+            // Make the POST request to the backend
+            const response = await fetch('/crack', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hash, algorithm }),
+            });
+
+            const result = await response.json();
+
+            // Display results
+            if (result.password) {
+                resultDiv.innerHTML = `<p class="success">✅ Password Found: <strong>${result.password}</strong></p>`;
+            } else if (result.password === null) {
+                resultDiv.innerHTML = `<p class="error">❌ Password not found in the list.</p>`;
+            } else {
+                resultDiv.innerHTML = `<p class="error">⚠️ Error: ${result.error}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
